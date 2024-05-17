@@ -20,17 +20,17 @@ fn fft_compl(x: Vec<Complex64>) -> Vec<Complex64> {
 
     let mut x_even: Vec<Complex64> = Vec::new();
     let mut x_odd: Vec<Complex64> = Vec::new();
-    for i in 0..x.len() {
+    for (i,&el) in x.iter().enumerate() {
         if i % 2 == 0 {
-            x_even.push(x[i]);
+            x_even.push(el);
         } else {
-            x_odd.push(x[i]);
+            x_odd.push(el);
         }
     }
-    let mut x_even_cmplx = fft_compl(x_even);
-    let mut x_odd_cmplx = fft_compl(x_odd);
+    let x_even_cmplx = fft_compl(x_even);
+    let x_odd_cmplx = fft_compl(x_odd);
 
-    let mut w = Complex::new(0_f64, 2_f64 * PI / n as f64);
+    let w = Complex::new(0_f64, 2_f64 * PI / n as f64);
     let mut f_k: Vec<Complex64> = Vec::new();
     for k in 0..x.len() {
         let k_compl = Complex::new(k as f64, 0_f64);
@@ -87,7 +87,7 @@ pub fn dft(x: &[f64]) -> Vec<Complex64> {
 }
 
 fn dft_compl(x: Vec<Complex64>) -> Vec<Complex64> {
-    let  w = Complex::new(0_f64, -2_f64 * PI / x.len() as f64);
+    let w = Complex::new(0_f64, -2_f64 * PI / x.len() as f64);
 
     // https://en.wikipedia.org/wiki/Discrete_Fourier_transform
     let mut dft_matrix: Vec<Vec<Complex64>> = Vec::new();
@@ -101,7 +101,7 @@ fn dft_compl(x: Vec<Complex64>) -> Vec<Complex64> {
         }
         dft_matrix.push(f_k.clone());
     }
-    
+
     mul_mv(dft_matrix, x)
 }
 
@@ -125,7 +125,7 @@ pub fn idft(x: &[Complex64]) -> Vec<f64> {
     let n = x.len() as f64;
     let mut rr: Vec<f64> = Vec::new();
     for mut i in r {
-       i /= Complex::new(n, 0_f64);
+        i /= Complex::new(n, 0_f64);
         rr.push(i.re);
     }
     rr
@@ -145,8 +145,8 @@ fn mul_mv(a: Vec<Vec<Complex64>>, b: Vec<Complex64>) -> Vec<Complex64> {
 
     let mut c: Vec<Complex64> = vec![Complex::new(0_f64, 0_f64); cols];
     for i in 0..rows {
-        for j in 0..cols {
-            c[i] += a[i][j] * b[j];
+        for (j,&el) in b.iter().enumerate().take(cols) {
+            c[i] += a[i][j] * el;
         }
     }
     c
@@ -239,7 +239,7 @@ mod tests {
             .collect();
         let r = dft(&values);
         println!("{:?}", r.len());
-        let o = idft(&r);
+        let _o = idft(&r);
     }
 
     #[test]
@@ -250,6 +250,6 @@ mod tests {
             .collect();
         let r = fft(&values);
         println!("{:?}", r.len());
-        let o = ifft(&r);
+        let _o = ifft(&r);
     }
 }
